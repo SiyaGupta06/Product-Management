@@ -1,0 +1,4 @@
+venv/
+products.json
+_pycache__/
+*.pyc
