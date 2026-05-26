@@ -26,7 +26,7 @@ class ProductService:
 
     def add_product(self, product, db):
 
-        products = repo.get_all_products(db)
+        products = repo.get_product_by_name(db, product)
 
         if product.name in products:
             raise HTTPException(
@@ -41,9 +41,9 @@ class ProductService:
             "message": "Product added successfully"
         }
 
-    def sell_product(self,db, name: str, quantity: int):
+    def sell_product(self, name: str, quantity: int, db):
 
-        product = repo.get_all_products(db, name)
+        product = repo.get_product_by_name(db, name)
 
         if  not  product:
             raise HTTPException(

@@ -10,7 +10,6 @@ class ProductRepository:
     
     def add_product(self, db: Session, product: Product):
         
-        product = Product(name=product.name, price=product.price, quantity=product.quantity)
         db.add(product)
         db.commit()
         db.refresh(product)
