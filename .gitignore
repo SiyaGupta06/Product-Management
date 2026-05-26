@@ -1,4 +1,7 @@
 venv/
-products.json
 _pycache__/
 *.pyc
+*.db
+*.sqlite3
+.env
+products.json

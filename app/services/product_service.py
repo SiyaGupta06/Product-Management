@@ -8,33 +8,25 @@ repo = ProductRepository()
 
 class ProductService:
 
-    def get_products(self):
+    def get_products(self, db):
 
-        products = repo.get_all_products()
+        return repo.get_all_products(db)
 
-        if not products:
-            raise HTTPException(
-                status_code=404,
-                detail="No products found"
-            )
-
-        return products
-
-    def get_product(self, name: str):
-
-        products = repo.get_all_products()
-
-        if name not in products:
+    def get_product_by_name(self, name: str, db):
+        
+        product = repo.get_product_by_name(db, name)
+        
+        if not product:
             raise HTTPException(
                 status_code=404,
                 detail="Product not found"
             )
 
-        return products[name]
+        return product
 
-    def add_product(self, product):
+    def add_product(self, product, db):
 
-        products = repo.get_all_products()
+        products = repo.get_all_products(db)
 
         if product.name in products:
             raise HTTPException(
@@ -42,56 +34,54 @@ class ProductService:
                 detail="Product already exists"
             )
 
-        products[product.name] = {
-            "id": product.id,
-            "name": product.name,
-            "price": product.price,
-            "quantity": product.quantity
-        }
 
-        repo.save_products(products)
+        repo.add_product(db, product)
 
         return {
             "message": "Product added successfully"
         }
 
-    def sell_product(self, name: str, quantity: int):
+    def sell_product(self,db, name: str, quantity: int):
 
-        products = repo.get_all_products()
+        product = repo.get_all_products(db, name)
 
-        if name not in products:
+        if  not  product:
             raise HTTPException(
                 status_code=404,
                 detail="Product not found"
             )
 
-        if products[name]["quantity"] < quantity:
+        if product.quantity < quantity:
             raise HTTPException(
                 status_code=400,
                 detail="Quantity insufficient"
             )
 
-        products[name]["quantity"] -= quantity
+        product.quantity -= quantity
 
-        repo.save_products(products)
+        db.commit()
+        db.refresh(product)
+
 
         return {
             "message": "Sold successfully"
         }
 
-    def delete_product(self, name: str):
+    def delete_product(self, name, db):
 
-        products = repo.get_all_products()
+        product = repo.get_product_by_name(db, name)
 
-        if name not in products:
+        if not product:
             raise HTTPException(
                 status_code=404,
                 detail="Product not found"
             )
 
-        del products[name]
+        repo.delete_product(db, product)
 
-        repo.save_products(products)
+        db.commit()
+        db.refresh(product)
+
 
         return {
             "message": "Product deleted successfully"
