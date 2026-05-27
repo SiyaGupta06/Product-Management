@@ -2,6 +2,8 @@ from fastapi import HTTPException
 
 from app.repositories.product_repository import ProductRepository
 
+from app.database.models import Product
+
 
 repo = ProductRepository()
 
@@ -12,22 +14,67 @@ class ProductService:
 
         return repo.get_all_products(db)
 
-    def get_product_by_name(self, name: str, db):
-        
-        return repo.get_product_by_name(db, name)
+    def get_product_by_name(self, name, db):
+
+        product = repo.get_product_by_name(
+            db,
+            name
+        )
+
+        if not product:
+
+            raise HTTPException(
+
+                status_code=404,
+
+                detail="Product not found"
+            )
+
+        return product
 
     def add_product(self, product, db):
 
-        return repo.add_product(db, product)
+        existing_product = repo.get_product_by_name(
+            db,
+            product.name
+        )
 
-    def sell_product(self, name: str, quantity: int, db):
+        if existing_product:
 
-       return repo.sell_product(db, name, quantity)
+            raise HTTPException(
 
+                status_code=400,
+
+                detail="Product already exists"
+            )
+
+        new_product = Product(
+
+            id=product.id,
+
+            name=product.name,
+
+            price=product.price,
+
+            quantity=product.quantity
+        )
+
+        return repo.create_product(db, new_product)
 
     def delete_product(self, name, db):
 
-        return repo.delete_product(db, name)
+        product = repo.get_product_by_name(
+            db,
+            name
+        )
 
+        if not product:
 
-       
+            raise HTTPException(
+
+                status_code=404,
+
+                detail="Product not found"
+            )
+
+        return repo.delete_product(db, product)

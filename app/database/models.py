@@ -19,7 +19,7 @@ class Sale(Base):
     product_id = Column(Integer, ForeignKey("products.id"))
     quantity_sold = Column(Integer)
     total_price = Column(Numeric(10, 2))
-    created_at = Column(DateTime, default=lambda:datetime.now(UTC))
+    created_at = Column(DateTime(timezone=True), default=lambda:datetime.now(UTC))
     
 
 

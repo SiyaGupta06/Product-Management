@@ -1,7 +1,7 @@
 venv/
 _pycache__/
 *.pyc
-*.db
+.vscode/
 *.sqlite3
 .env
 products.json
